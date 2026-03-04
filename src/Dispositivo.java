@@ -9,7 +9,7 @@ public class Dispositivo {
 
 
     public Dispositivo() {
-        this.codigo = "Sin asignar";
+        this.codigo = "Sin asignar.";
         this.estado = "Apagado";
     }
 
