@@ -30,13 +30,27 @@ public class Mascota {
         return this.id;
     }
 
+    public String getNombre() {
+        return this.nombre;
+    }
+
+    public String getTipoAnimal() {
+        return this.tipoAnimal;
+    }
+
+    public String getEstado() {
+        return this.estado;
+    }
+
     public Dispositivo getDispositivoAsociado() {
         return this.dispositivoAsociado;
     }
 
+
     public void setDispositivoAsociado(Dispositivo dispositivo) {
         this.dispositivoAsociado = dispositivo;
     }
+
 
     @Override
     public String toString() {

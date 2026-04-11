@@ -1,0 +1,7 @@
+public enum TipoEvento {
+    ENCENDIDO,
+    APAGADO,
+    MOVIMIENTO_DETECTADO,
+    BATERIA_BAJA,
+    PERDIDA_CONEXION
+}

@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
@@ -6,160 +7,182 @@ public class Main {
 
         ArrayList<Mascota> listaMascotas = new ArrayList<>();
         ArrayList<Dispositivo> listaDispositivos = new ArrayList<>();
+        ArrayList<EventoDispositivo> listaEventos = new ArrayList<>();
+        ArrayList<Alerta> listaAlertas = new ArrayList<>();
+
         Scanner scanner = new Scanner(System.in);
         int opcion = 0;
+        boolean simulacionActiva = false;
 
         do {
-            System.out.println("\n=== SISTEMA DE RASTREO DE MASCOTAS ===");
-            System.out.println("1. Registrar mascotas");
-            System.out.println("2. Registrar dispositivos de localización");
-            System.out.println("3. Asociar dispositivos a mascotas");
-            System.out.println("4. Registrar ubicaciones de forma manual");
-            System.out.println("5. Consultar la información almacenada");
-            System.out.println("6. Salir");
+            System.out.println("\n=== TAREA 2: SISTEMA CONCURRENTE DE RASTREO ===");
+            System.out.println("1. Registrar mascota");
+            System.out.println("2. Registrar dispositivo");
+            System.out.println("3. Asociar dispositivo a mascota");
+            System.out.println("4. Registrar ubicación manualmente");
+            System.out.println("5. Consultar información de mascota");
+            System.out.println("6. Iniciar / Detener Simulación Automática");
+            System.out.println("7. Generar Alertas y Eventos");
+            System.out.println("8. Ver Historial de Eventos y Alertas");
+            System.out.println("9. Salir");
             System.out.print("Seleccione una opción: ");
 
-            opcion = scanner.nextInt();
-            scanner.nextLine(); // Limpiar el buffer
+
+            try {
+                opcion = scanner.nextInt();
+                scanner.nextLine();
+            } catch (InputMismatchException e) {
+                System.out.println("❌ ERROR: Entrada inválida. Debe ingresar un número.");
+                scanner.nextLine();
+                opcion = 0;
+                continue;
+            }
 
             switch (opcion) {
                 case 1:
                     System.out.println("\n--- REGISTRAR MASCOTA ---");
-                    System.out.print("ID de la mascota (número): ");
+                    System.out.print("ID (número): ");
                     int id = scanner.nextInt();
                     scanner.nextLine();
                     System.out.print("Nombre: ");
                     String nombre = scanner.nextLine();
                     System.out.print("Tipo de animal: ");
                     String tipo = scanner.nextLine();
-                    System.out.print("Estado (Ej. Activa, Perdida): ");
+                    System.out.print("Estado: ");
                     String estado = scanner.nextLine();
-
                     listaMascotas.add(new Mascota(id, nombre, tipo, estado));
-                    System.out.println("✅ Mascota registrada con éxito.");
+                    System.out.println("✅ Mascota registrada.");
                     break;
 
                 case 2:
                     System.out.println("\n--- REGISTRAR DISPOSITIVO ---");
-                    System.out.print("Código del dispositivo (Ej. DEV-01): ");
+                    System.out.print("Código: ");
                     String codigo = scanner.nextLine();
-                    System.out.print("Estado del dispositivo (Ej. Encendido, Apagado): ");
-                    String estadoDisp = scanner.nextLine();
-
-                    listaDispositivos.add(new Dispositivo(codigo, estadoDisp));
-                    System.out.println("✅ Dispositivo registrado con éxito.");
+                    listaDispositivos.add(new Dispositivo(codigo, "En Espera"));
+                    System.out.println("✅ Dispositivo registrado.");
                     break;
 
                 case 3:
                     System.out.println("\n--- ASOCIAR DISPOSITIVO ---");
-                    System.out.print("Ingrese el ID de la mascota: ");
-                    int idMascotaBuscar = scanner.nextInt();
+                    System.out.print("ID de la mascota: ");
+                    int idMascota = scanner.nextInt();
                     scanner.nextLine();
-
-                    Mascota mascotaEncontrada = null;
+                    Mascota mascEncontrada = null;
                     for (Mascota m : listaMascotas) {
-                        if (m.getId() == idMascotaBuscar) {
-                            mascotaEncontrada = m;
-                            break;
-                        }
+                        if (m.getId() == idMascota) { mascEncontrada = m; break; }
                     }
 
-                    if (mascotaEncontrada == null) {
+                    if (mascEncontrada == null) {
                         System.out.println("❌ Mascota no encontrada.");
                         break;
                     }
 
-                    System.out.print("Ingrese el Código del dispositivo a asociar: ");
-                    String codigoBuscar = scanner.nextLine();
-
-                    Dispositivo dispositivoEncontrado = null;
+                    System.out.print("Código del dispositivo: ");
+                    String codBuscar = scanner.nextLine();
+                    Dispositivo dispEncontrado = null;
                     for (Dispositivo d : listaDispositivos) {
-                        if (d.getCodigo().equals(codigoBuscar)) {
-                            dispositivoEncontrado = d;
-                            break;
-                        }
+                        if (d.getCodigo().equals(codBuscar)) { dispEncontrado = d; break; }
                     }
 
-                    if (dispositivoEncontrado != null) {
-                        mascotaEncontrada.setDispositivoAsociado(dispositivoEncontrado);
-                        System.out.println("✅ Dispositivo " + codigoBuscar + " asociado a la mascota " + mascotaEncontrada.getId());
+                    if (dispEncontrado != null) {
+                        mascEncontrada.setDispositivoAsociado(dispEncontrado);
+                        System.out.println("✅ Dispositivo asociado exitosamente.");
                     } else {
                         System.out.println("❌ Dispositivo no encontrado.");
                     }
                     break;
 
                 case 4:
-                    System.out.println("\n--- REGISTRAR UBICACIÓN ---");
-                    System.out.print("Ingrese el ID de la mascota para registrar ubicación: ");
-                    int idMascotaUbi = scanner.nextInt();
-                    scanner.nextLine();
+                    System.out.println("\n--- REGISTRAR UBICACIÓN MANUAL ---");
 
-                    Mascota mascotaParaUbicacion = null;
-                    for (Mascota m : listaMascotas) {
-                        if (m.getId() == idMascotaUbi) {
-                            mascotaParaUbicacion = m;
-                            break;
-                        }
-                    }
-
-                    if (mascotaParaUbicacion != null && mascotaParaUbicacion.getDispositivoAsociado() != null) {
-                        System.out.print("ID del registro (número consecutivo): ");
-                        int idRegistro = scanner.nextInt();
-                        scanner.nextLine();
-                        System.out.print("Fecha y Hora (Ej. 03/03/2026 14:00): ");
-                        String fechaHora = scanner.nextLine();
-                        System.out.print("Información de ubicación (Ej. Parque de la Paz): ");
-                        String infoUbi = scanner.nextLine();
-
-                        RegistroUbicacion nuevaUbi = new RegistroUbicacion(idRegistro, fechaHora, infoUbi);
-                        mascotaParaUbicacion.getDispositivoAsociado().agregarUbicacion(nuevaUbi);
-
-                        System.out.println("✅ Ubicación registrada correctamente.");
-                    } else {
-                        System.out.println("❌ Error: Mascota no encontrada o no tiene dispositivo asociado.");
-                    }
+                    System.out.println("📝 Nota: Con la simulación activa (Opción 6), los dispositivos reportan solos.");
                     break;
 
                 case 5:
-                    System.out.println("\n--- CONSULTAR INFORMACIÓN DE MASCOTA ---");
-                    System.out.print("Ingrese el ID de la mascota a consultar: ");
-                    int idConsulta = scanner.nextInt();
-                    scanner.nextLine();
 
+                    System.out.println("\n--- CONSULTAR MASCOTA ---");
+                    System.out.print("ID de la mascota: ");
+                    int idCons = scanner.nextInt();
+                    scanner.nextLine();
                     boolean encontrada = false;
                     for (Mascota m : listaMascotas) {
-                        if (m.getId() == idConsulta) {
+                        if (m.getId() == idCons) {
                             encontrada = true;
-                            System.out.println("\n" + m.toString());
-
+                            System.out.println(m.toString());
                             if (m.getDispositivoAsociado() != null) {
-                                System.out.println("\nHistorial de Ubicaciones del dispositivo:");
-                                ArrayList<RegistroUbicacion> historial = m.getDispositivoAsociado().getHistorialUbicaciones();
-                                if (historial.isEmpty()) {
-                                    System.out.println("- No hay ubicaciones registradas aún.");
-                                } else {
-                                    for (RegistroUbicacion ubi : historial) {
-                                        System.out.println("  -> ID Registro: " + ubi.getIdentificador() + " | Fecha: " + ubi.getFechaHora() + " | Ubicación: " + ubi.getInformacionUbicacion());
-                                    }
-                                }
+                                System.out.println("Ubicaciones registradas: " + m.getDispositivoAsociado().getHistorialUbicaciones().size());
                             }
                             break;
                         }
                     }
-
-                    if (!encontrada) {
-                        System.out.println("❌ Mascota no encontrada en el sistema.");
-                    }
+                    if (!encontrada) System.out.println("❌ Mascota no encontrada.");
                     break;
 
                 case 6:
-                    System.out.println("Saliendo del sistema");
+
+                    if (!simulacionActiva) {
+                        System.out.println("\n🚀 Iniciando simulación concurrente...");
+                        for (Dispositivo d : listaDispositivos) {
+                            if (!d.isAlive()) {
+                                try {
+                                    d.start();
+                                } catch (IllegalThreadStateException e) {
+                                    System.out.println("⚠️ El hilo de " + d.getCodigo() + " ya no puede reiniciarse.");
+                                }
+                            }
+                        }
+                        simulacionActiva = true;
+                        System.out.println("✅ Dispositivos transmitiendo de forma autónoma.");
+                    } else {
+                        System.out.println("\n🛑 Deteniendo simulación...");
+                        for (Dispositivo d : listaDispositivos) {
+                            d.detenerSimulacion();
+                        }
+                        simulacionActiva = false;
+                    }
+                    break;
+
+                case 7:
+
+                    System.out.println("\n🔍 Analizando actividad de dispositivos...");
+                    int nuevasAlertas = 0;
+                    for (Mascota m : listaMascotas) {
+                        Dispositivo d = m.getDispositivoAsociado();
+                        if (d != null) {
+                            int cantidadUbicaciones = d.getHistorialUbicaciones().size();
+
+                            if (cantidadUbicaciones > 3) {
+                                EventoDispositivo nuevoEvento = new EventoDispositivo(TipoEvento.MOVIMIENTO_DETECTADO, d);
+                                Alerta nuevaAlerta = new Alerta(TipoAlerta.INFORMATIVA, m);
+
+                                listaEventos.add(nuevoEvento);
+                                listaAlertas.add(nuevaAlerta);
+                                nuevasAlertas++;
+                            }
+                        }
+                    }
+                    System.out.println("✅ Análisis completado. Se generaron " + nuevasAlertas + " eventos y alertas.");
+                    break;
+
+                case 8:
+                    System.out.println("\n=== 📋 REGISTRO DE EVENTOS ===");
+                    if (listaEventos.isEmpty()) System.out.println("No hay eventos registrados.");
+                    for (EventoDispositivo e : listaEventos) System.out.println(e.toString());
+
+                    System.out.println("\n=== ⚠️ REGISTRO DE ALERTAS ===");
+                    if (listaAlertas.isEmpty()) System.out.println("No hay alertas registradas.");
+                    for (Alerta a : listaAlertas) System.out.println(a.toString());
+                    break;
+
+                case 9:
+                    System.out.println("Finalizando sistema... ¡Deteniendo todos los hilos!");
+                    for (Dispositivo d : listaDispositivos) d.detenerSimulacion();
                     break;
 
                 default:
-                    System.out.println("Opción inválida. Intente de nuevo.");
+                    System.out.println("Opción no válida.");
             }
-        } while (opcion != 6);
+        } while (opcion != 9);
 
         scanner.close();
     }
